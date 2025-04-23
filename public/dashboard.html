@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-base-200 h-full w-full p-8">
+<head>
+  <meta charset="UTF-8">
+  <title>Manager | Events</title>
+  <link href="/public/css/output.css" rel="stylesheet">
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    form { display: flex; flex-direction: column; max-width: 400px; gap: 1rem; }
+  </style>
+</head>
+<body class="bg-base-200 h-full w-full p-8">
+    <div class="container mx-auto flex flex-col items-center justify-center h-full">
+      <h2 class="text-2xl font-bold mb-4">Welcome, <span id="usernameDisplay" class="text-primary"></span>!</h2>
+      <form id="eventForm" class="card bg-base-100 shadow-md p-6 w-full max-w-md">
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Event Name</span>
+          </label>
+          <input type="text" id="eventName" placeholder="Event Name" class="input input-bordered" required>
+        </div>
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Event Time</span>
+          </label>
+          <input type="time" id="eventTime" class="input input-bordered" required>
+        </div>
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Day (e.g., Monday)</span>
+          </label>
+          <input type="text" id="eventDay" placeholder="Day (e.g., Monday)" class="input input-bordered" required>
+        </div>
+        <div class="form-control mb-4">
+          <label class="cursor-pointer label">
+            <span class="label-text">Repeat Weekly</span>
+            <input type="checkbox" id="repeat" class="checkbox">
+          </label>
+        </div>
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Email (optional)</span>
+          </label>
+          <input type="email" id="email" placeholder="Email (optional)" class="input input-bordered">
+        </div>
+        <button type="submit" class="btn btn-primary w-full">Add Event</button>
+      </form>
+      <div id="result" class="mt-4 text-center text-lg font-semibold"></div>
+    </div>
+  
+    <script>
+      // Show username if stored
+      document.getElementById('usernameDisplay').innerText = localStorage.getItem('username') || 'User';
+  
+      document.getElementById('eventForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const event = {
+          name: document.getElementById('eventName').value,
+          time: document.getElementById('eventTime').value,
+          day: document.getElementById('eventDay').value,
+          repeat: document.getElementById('repeat').checked,
+          email: document.getElementById('email').value || null,
+        };
+  
+        const res = await fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(event)
+        });
+  
+        const data = await res.json();
+        document.getElementById('result').innerText = res.ok ? "Event added!" : data.error || "Error";
+      });
+    </script>
+  </body>
+</html>
