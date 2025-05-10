@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Dashboard</title>
+    <link rel="stylesheet" href="/public/css/output.css">
+</head>
+<body>
+    <h1>Event Dashboard</h1>
+    <form id="event-form">
+        <input type="text" id="event-name" placeholder="Event Name" class="input input-bordered" required>
+        <input type="datetime-local" id="event-time" class="input input-bordered" required>
+        <button type="submit" class="btn btn-primary">Add Event</button>
+    </form>
+    <ul id="event-list"></ul>
+
+    <!-- Modal for editing events -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Edit Event</h3>
+            <form id="edit-form">
+                <input type="text" id="edit-event-name" placeholder="Event Name" class="input input-bordered" required>
+                <input type="datetime-local" id="edit-event-time" class="input input-bordered" required>
+                <div class="modal-action">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a href="#" class="btn">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/public/js/app.js"></script>
+</body>
+</html>

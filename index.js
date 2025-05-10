@@ -1,29 +1,29 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
 const app = express();
 
+// Set view engine to EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.use(cors());
 app.use(express.json());
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.error(err));
+app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from 'public'
-app.use('/public', express.static('public'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// Route `/` serves login.html
+// Route `/` renders index.ejs
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.render('index');
 });
 
-// Route `/dashboard` serves dashboard.html
+// Route `/dashboard` renders dashboard.ejs
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  res.render('dashboard');
 });
 
 app.use('/api/events', require('./routes/events'));

@@ -2,6 +2,7 @@
 <html lang="en" class="bg-base-200 h-full w-full p-8">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manager | Events</title>
   <link href="/public/css/output.css" rel="stylesheet">
   <style>
@@ -46,6 +47,7 @@
         <button type="submit" class="btn btn-primary w-full">Add Event</button>
       </form>
       <div id="result" class="mt-4 text-center text-lg font-semibold"></div>
+      <ul id="event-list" class="mt-4 w-full max-w-md"></ul>
     </div>
   
     <script>
@@ -70,6 +72,38 @@
   
         const data = await res.json();
         document.getElementById('result').innerText = res.ok ? "Event added!" : data.error || "Error";
+
+        if (res.ok) {
+          const eventList = document.getElementById('event-list');
+          const listItem = document.createElement('li');
+          listItem.className = "flex justify-between items-center p-2 border-b";
+          listItem.innerHTML = `
+            <span>${event.name} - ${event.time} - ${event.day}</span>
+            <div>
+              <button class="btn btn-sm btn-secondary edit-btn">Edit</button>
+              <button class="btn btn-sm btn-error delete-btn">Delete</button>
+            </div>
+          `;
+          eventList.appendChild(listItem);
+
+          listItem.querySelector('.edit-btn').addEventListener('click', () => {
+            document.getElementById('eventName').value = event.name;
+            document.getElementById('eventTime').value = event.time;
+            document.getElementById('eventDay').value = event.day;
+            document.getElementById('repeat').checked = event.repeat;
+            document.getElementById('email').value = event.email || '';
+            eventList.removeChild(listItem);
+          });
+
+          listItem.querySelector('.delete-btn').addEventListener('click', async () => {
+            const deleteRes = await fetch(`/api/events/${event.name}`, { method: 'DELETE' });
+            if (deleteRes.ok) {
+              eventList.removeChild(listItem);
+            } else {
+              alert("Failed to delete event.");
+            }
+          });
+        }
       });
     </script>
   </body>

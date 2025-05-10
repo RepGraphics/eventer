@@ -13,12 +13,12 @@ router.post('/login', async (req, res) => {
     if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
     if (user !== username) return res.status(400).json({ msg: 'Invalid credentials' });
 
-    const isMatch = bcrypt.compare(password, process.env.PASSWORD);
+    const isMatch = await bcrypt.compare(password, process.env.PASSWORD);
     if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
     const payload = {
       user: {
-        username: user.username
+        username: user
       }
     };
 

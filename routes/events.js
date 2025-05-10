@@ -1,21 +1,55 @@
 const express = require('express');
 const router = express.Router();
+const Event = require('../models/Event');
 
-const events = []; // This can be changed to MongoDB later
+// Get all events
+router.get('/', (req, res) => {
+    Event.getAllEvents((err, events) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to fetch events' });
+        }
+        res.json(events);
+    });
+});
 
+// Create a new event
 router.post('/', (req, res) => {
-  const { name, time, day, repeat, email } = req.body;
+    const { name, time } = req.body;
+    if (!name || !time) {
+        return res.status(400).json({ error: 'Name and time are required' });
+    }
+    Event.createEvent(name, time, (err, id) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to create event' });
+        }
+        res.json({ id, name, time });
+    });
+});
 
-  if (!name || !time || !day) {
-    return res.status(400).json({ error: 'Missing fields' });
-  }
+// Update an event
+router.put('/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, time } = req.body;
+    if (!name || !time) {
+        return res.status(400).json({ error: 'Name and time are required' });
+    }
+    Event.updateEvent(id, name, time, (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to update event' });
+        }
+        res.json({ message: 'Event updated successfully' });
+    });
+});
 
-  const newEvent = { name, time, day, repeat, email };
-  events.push(newEvent);
-
-  // (Optional) Send notification or save to DB
-
-  res.json({ success: true, event: newEvent });
+// Delete an event
+router.delete('/:id', (req, res) => {
+    const { id } = req.params;
+    Event.deleteEvent(id, (err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to delete event' });
+        }
+        res.json({ message: 'Event deleted successfully' });
+    });
 });
 
 module.exports = router;
