@@ -19,7 +19,7 @@ Eventer is an open-source event management and notification platform designed fo
 
 ## Screenshots
 
-![Dashboard Screenshot](public/images/logo-t.webp)
+![Dashboard Screenshot](public/images/image.png)
 
 ## Getting Started
 
