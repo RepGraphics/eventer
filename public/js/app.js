@@ -344,17 +344,14 @@ if (window.location.pathname === '/dashboard') {
           });
         });
         // Always show uncategorized group as drop target
-        const showUncat = grouped[''] && grouped[''].length > 0 || cats.length === 0;
-        if (showUncat) {
-          const catHeader = document.createElement('div');
-          catHeader.className = 'font-bold text-lg mt-4 mb-2 text-primary droppable-category';
-          catHeader.textContent = '(Uncategorized)';
-          makeCategoryDroppable(catHeader, '');
-          eventList.appendChild(catHeader);
-          (grouped[''] || []).forEach(event => {
-            renderEventListItem(event, updateBulkDeleteBtn, eventList);
-          });
-        }
+        const catHeader = document.createElement('div');
+        catHeader.className = 'font-bold text-lg mt-4 mb-2 text-primary droppable-category';
+        catHeader.textContent = '(Uncategorized)';
+        makeCategoryDroppable(catHeader, '');
+        eventList.appendChild(catHeader);
+        (grouped[''] || []).forEach(event => {
+          renderEventListItem(event, updateBulkDeleteBtn, eventList);
+        });
         eventList.style.opacity = '1';
       }, 150);
     }
