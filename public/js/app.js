@@ -221,7 +221,7 @@ if (window.location.pathname === '/dashboard') {
       if (cats.length === 0) return; // No dropdown if no categories
       const catSelect = document.createElement('select');
       catSelect.id = 'event-category';
-      catSelect.className = 'select select-bordered w-full mb-4';
+      catSelect.className = 'select select-bordered w-full mb-4 mt-4'; // Added mt-4 for more top margin
       catSelect.innerHTML = '<option value="">(Uncategorized)</option>';
       cats.forEach(cat => {
         const opt = document.createElement('option');
@@ -499,50 +499,6 @@ if (window.location.pathname === '/dashboard') {
           renderEvents();
         } else {
           showNotification('Failed to move event', 'error');
-        }
-      };
-    }
-
-    if (eventForm) {
-      const catSelect = document.createElement('select');
-      catSelect.id = 'event-category';
-      catSelect.className = 'select select-bordered w-full mb-4';
-      catSelect.innerHTML = '<option value="">(Uncategorized)</option>';
-      fetch('/api/events/categories').then(r => r.json()).then(cats => {
-        cats.filter(cat => cat).forEach(cat => {
-          const opt = document.createElement('option');
-          opt.value = cat;
-          opt.textContent = cat;
-          catSelect.appendChild(opt);
-        });
-      });
-      const dtInput = eventForm.querySelector('#event-datetime');
-      if (dtInput && dtInput.parentNode === eventForm && dtInput.nextSibling) {
-        eventForm.insertBefore(catSelect, dtInput.nextSibling);
-      } else {
-        eventForm.appendChild(catSelect);
-      }
-      // Patch submit to include category
-      const origSubmit = eventForm.onsubmit;
-      eventForm.onsubmit = async function(e) {
-        e.preventDefault();
-        const event = {
-          name: document.getElementById('event-name').value,
-          time: document.getElementById('event-datetime').value,
-          category: document.getElementById('event-category').value || ''
-        };
-        const res = await fetch('/api/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(event)
-        });
-        const data = await res.json();
-        showNotification(data.notification || 'Event added!', 'success');
-        if (res.ok) {
-          renderEvents();
-          eventForm.reset();
-        } else {
-          showNotification('Failed to add event.', 'error');
         }
       };
     }
