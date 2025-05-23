@@ -19,7 +19,10 @@ app.use(session({
   secret: process.env.JWT_SECRET || 'keyboard cat',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // Set to true if using HTTPS
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // Only secure in production (HTTPS)
+    sameSite: 'lax' // Helps with cross-site issues
+  }
 }));
 
 // Auth middleware

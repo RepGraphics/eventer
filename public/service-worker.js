@@ -6,9 +6,9 @@ self.addEventListener('install', event => {
         '/dashboard',
         '/public/css/output.css',
         '/public/js/app.js',
-        '/images/logo.png',
-        '/images/logo-192.png',
-        '/images/logo-512.png'
+        '/public/images/icon.webp',
+        '/public/images/logo-t.webp',
+        '/public/images/logo.webp'
       ]);
     })
   );

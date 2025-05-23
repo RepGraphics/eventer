@@ -1,6 +1,3 @@
-// Set API_URL based on current domain
-const API_URL = `${window.location.origin}/api/auth`;
-
 // Only attach login form handler if it exists (login page)
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
@@ -8,7 +5,7 @@ if (loginForm) {
     e.preventDefault();
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
-    const res = await fetch(`${API_URL}/login`, {
+    const res = await fetch(`/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),

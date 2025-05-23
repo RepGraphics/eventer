@@ -1,5 +1,5 @@
 require('dotenv').config();
-const APP_URL = process.env.APP_URL || 'http://localhost:8080';
+const APP_URL = process.env.APP_URL;
 
 const express = require('express');
 const router = express.Router();
