@@ -26,7 +26,9 @@ router.post('/login', async (req, res) => {
       if (err) throw err;
       // Set session user for express-session
       req.session.user = user;
-      res.json({ token });
+      req.session.save(() => {
+        res.json({ token });
+      });
     });
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });

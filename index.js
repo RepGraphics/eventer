@@ -6,6 +6,9 @@ require('dotenv').config();
 
 const app = express();
 
+// Trust proxy for correct secure cookie handling behind reverse proxies (e.g., Nginx, cloud)
+app.set('trust proxy', 1);
+
 // Set view engine to EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'public/views'));
