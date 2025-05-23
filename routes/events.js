@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
 const mailer = require('../utils/mailer');
+const discord = require('../utils/discord');
 
 // Get all events
 router.get('/', (req, res) => {
@@ -24,17 +25,48 @@ router.post('/', async (req, res) => {
             return res.status(500).json({ error: 'Failed to create event' });
         }
         // Email notification
-        try {
+        if (mailer && mailer.sendMail) {
+          try {
             await mailer.sendMail({
-                to: process.env.NOTIFY_EMAIL || process.env.EMAIL_USER,
-                subject: 'New Event Created',
-                text: `Event "${name}" scheduled for ${time}`,
-                html: `<b>Event:</b> ${name}<br><b>Time:</b> ${time}`
+              subject: 'New Event Created',
+              text: `Event "${name}" scheduled for ${time}`,
+              html: `<b>Event:</b> ${name}<br><b>Time:</b> ${time}`,
+              username: req.session.user
             });
-        } catch (e) {
-            console.error('Email send failed:', e.message);
+          } catch (e) {
+            if (!/not enabled|not configured/.test(e.message)) {
+              console.error('Email send failed:', e.message);
+            }
+          }
         }
-        res.json({ id, name, time, notification: 'Event created and email sent.' });
+        // Discord notification
+        if (discord && discord.sendDiscordWebhook) {
+          try {
+            // Discord timestamp: <t:unix:REL>
+            const unixTime = Math.floor(new Date(time).getTime() / 1000);
+            await discord.sendDiscordWebhook({
+              embed: {
+                title: '📅 New Event Created',
+                description: `**Event:** ${name}\n**Time:** <t:${unixTime}:F> (<t:${unixTime}:R>)`,
+                color: 0x2563eb,
+                thumbnail: {
+                  url: 'https://localhost:8080/public/images/logo-t.webp'
+                },
+                footer: {
+                  text: 'Eventer Notification',
+                  icon_url: 'https://localhost:8080/public/images/icon.webp'
+                },
+                timestamp: new Date().toISOString()
+              },
+              username: req.session.user
+            });
+          } catch (e) {
+            if (!/not enabled|not configured/.test(e.message)) {
+              console.error('Discord webhook failed:', e.message);
+            }
+          }
+        }
+        res.json({ id, name, time, notification: 'Event created and notifications sent.' });
     });
 });
 
@@ -50,40 +82,106 @@ router.put('/:id', async (req, res) => {
             return res.status(500).json({ error: 'Failed to update event' });
         }
         // Email notification
-        try {
+        if (mailer && mailer.sendMail) {
+          try {
             await mailer.sendMail({
-                to: process.env.NOTIFY_EMAIL || process.env.EMAIL_USER,
-                subject: 'Event Updated',
-                text: `Event "${name}" updated to ${time}`,
-                html: `<b>Event:</b> ${name}<br><b>New Time:</b> ${time}`
+              subject: 'Event Updated',
+              text: `Event "${name}" updated to ${time}`,
+              html: `<b>Event:</b> ${name}<br><b>New Time:</b> ${time}`,
+              username: req.session.user
             });
-        } catch (e) {
-            console.error('Email send failed:', e.message);
+          } catch (e) {
+            if (!/not enabled|not configured/.test(e.message)) {
+              console.error('Email send failed:', e.message);
+            }
+          }
         }
-        res.json({ message: 'Event updated successfully', notification: 'Event updated and email sent.' });
+        // Discord notification
+        if (discord && discord.sendDiscordWebhook) {
+          try {
+            const unixTime = Math.floor(new Date(time).getTime() / 1000);
+            await discord.sendDiscordWebhook({
+              embed: {
+                title: '✏️ Event Updated',
+                description: `**Event:** ${name}\n**New Time:** <t:${unixTime}:F> (<t:${unixTime}:R>)`,
+                color: 0xfbbf24,
+                thumbnail: {
+                  url: 'https://localhost:8080/public/images/logo-t.webp'
+                },
+                footer: {
+                  text: 'Eventer Notification',
+                  icon_url: 'https://localhost:8080/public/images/icon.webp'
+                },
+                timestamp: new Date().toISOString()
+              },
+              username: req.session.user
+            });
+          } catch (e) {
+            if (!/not enabled|not configured/.test(e.message)) {
+              console.error('Discord webhook failed:', e.message);
+            }
+          }
+        }
+        res.json({ message: 'Event updated successfully', notification: 'Event updated and notifications sent.' });
     });
 });
 
 // Delete an event
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
-    // Fetch event name for notification (optional, not implemented here)
-    Event.deleteEvent(id, async (err) => {
+    // Fetch event name before deleting
+    Event.getAllEvents((err, events) => {
         if (err) {
-            return res.status(500).json({ error: 'Failed to delete event' });
+            return res.status(500).json({ error: 'Failed to fetch events for delete' });
         }
-        // Email notification
-        try {
-            await mailer.sendMail({
-                to: process.env.NOTIFY_EMAIL || process.env.EMAIL_USER,
-                subject: 'Event Deleted',
-                text: `Event with ID ${id} was deleted.`,
-                html: `<b>Event ID:</b> ${id} was deleted.`
-            });
-        } catch (e) {
-            console.error('Email send failed:', e.message);
-        }
-        res.json({ message: 'Event deleted successfully', notification: 'Event deleted and email sent.' });
+        const event = events.find(e => String(e.id) === String(id));
+        const eventName = event ? event.name : undefined;
+        Event.deleteEvent(id, async (err) => {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to delete event' });
+            }
+            // Email notification
+            if (mailer && mailer.sendMail) {
+              try {
+                await mailer.sendMail({
+                  subject: 'Event Deleted',
+                  text: eventName ? `Event "${eventName}" (ID ${id}) was deleted.` : `Event with ID ${id} was deleted.`,
+                  html: eventName ? `<b>Event:</b> ${eventName}<br><b>Event ID:</b> ${id} was deleted.` : `<b>Event ID:</b> ${id} was deleted.`,
+                  username: req.session.user
+                });
+              } catch (e) {
+                if (!/not enabled|not configured/.test(e.message)) {
+                  console.error('Email send failed:', e.message);
+                }
+              }
+            }
+            // Discord notification
+            if (discord && discord.sendDiscordWebhook) {
+              try {
+                await discord.sendDiscordWebhook({
+                  embed: {
+                    title: '🗑️ Event Deleted',
+                    description: eventName ? `**Event:** ${eventName}\n**Event ID:** ${id} was deleted.` : `**Event ID:** ${id} was deleted.`,
+                    color: 0xef4444,
+                    thumbnail: {
+                      url: 'https://localhost:8080/public/images/logo-t.webp'
+                    },
+                    footer: {
+                      text: 'Eventer Notification',
+                      icon_url: 'https://localhost:8080/public/images/icon.webp'
+                    },
+                    timestamp: new Date().toISOString()
+                  },
+                  username: req.session.user
+                });
+              } catch (e) {
+                if (!/not enabled|not configured/.test(e.message)) {
+                  console.error('Discord webhook failed:', e.message);
+                }
+              }
+            }
+            res.json({ message: 'Event deleted successfully', notification: 'Event deleted and notifications sent.' });
+        });
     });
 });
 

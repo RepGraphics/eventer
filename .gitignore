@@ -26,3 +26,5 @@ replay_pid*
 node_modules
 package-lock.json
 .env
+data/user-settings.json
+data/events.db

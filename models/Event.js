@@ -16,8 +16,25 @@ db.run(`CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     time TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    sent INTEGER DEFAULT 0,
+    reminder_sent INTEGER DEFAULT 0
 )`);
+
+// Add 'sent' and 'reminder_sent' columns if not exist
+// This is a one-time migration
+const alterTable = `ALTER TABLE events ADD COLUMN sent INTEGER DEFAULT 0`;
+db.run(alterTable, (err) => {
+    if (err && !/duplicate column name/i.test(err.message)) {
+        console.error('Error adding sent column:', err.message);
+    }
+});
+const alterTable2 = `ALTER TABLE events ADD COLUMN reminder_sent INTEGER DEFAULT 0`;
+db.run(alterTable2, (err) => {
+    if (err && !/duplicate column name/i.test(err.message)) {
+        console.error('Error adding reminder_sent column:', err.message);
+    }
+});
 
 module.exports = {
     getAllEvents: (callback) => {
@@ -43,7 +60,7 @@ module.exports = {
     },
 
     updateEvent: (id, name, time, callback) => {
-        db.run('UPDATE events SET name = ?, time = ? WHERE id = ?', [name, time, id], (err) => {
+        db.run('UPDATE events SET name = ?, time = ?, sent = 0, reminder_sent = 0 WHERE id = ?', [name, time, id], (err) => {
             callback(err);
         });
     },
@@ -52,5 +69,18 @@ module.exports = {
         db.run('DELETE FROM events WHERE id = ?', [id], (err) => {
             callback(err);
         });
+    },
+
+    getUnsentEvents: (callback) => {
+        db.all('SELECT * FROM events WHERE sent = 0', [], callback);
+    },
+    markEventSent: (id, callback) => {
+        db.run('UPDATE events SET sent = 1 WHERE id = ?', [id], callback);
+    },
+    getUnremindedEvents: (callback) => {
+        db.all('SELECT * FROM events WHERE reminder_sent = 0', [], callback);
+    },
+    markEventReminded: (id, callback) => {
+        db.run('UPDATE events SET reminder_sent = 1 WHERE id = ?', [id], callback);
     }
 };

@@ -47,11 +47,22 @@ app.get('/dashboard', ensureSignedIn, (req, res) => {
   res.render('dashboard', { username: req.session.user });
 });
 
+// Settings page (protected)
+app.get('/settings', ensureSignedIn, (req, res) => {
+  res.render('settings', { username: req.session.user });
+});
+
 // Auth routes (login sets session)
 app.use('/api/auth', require('./routes/auth'));
 
 // Events API (protected)
 app.use('/api/events', ensureSignedIn, require('./routes/events'));
 
+// Settings API (protected)
+app.use('/api/settings', ensureSignedIn, require('./routes/settings'));
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Start the event watcher (runs in the same process)
+require('./utils/eventWatcher');

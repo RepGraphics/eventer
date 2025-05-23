@@ -9,12 +9,12 @@
   <meta name="theme-color" content="#2563eb">
   <link rel="icon" type="image/webp" href="/public/images/icon.webp">
 </head>
-<body class="h-full w-full">
+<body class="h-full w-full bg-base-100">
   <div class="drawer drawer-end">
     <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content flex flex-col min-h-screen">
       <!-- Navbar -->
-      <div class="navbar w-full">
+      <div class="navbar w-full px-2 sm:px-4">
         <div class="flex-none lg:hidden">
           <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block h-6 w-6 stroke-current">
@@ -23,8 +23,8 @@
           </label>
         </div>
         <div class="mx-2 flex-1 px-2 flex items-center gap-2 text-2xl font-bold text-white">
-          <img src="/public/images/logo-t.webp" alt="Eventer Logo" class="h-12 w-12 hidden lg:inline-block" />
-          Eventer
+          <img src="/public/images/logo-t.webp" alt="Eventer Logo" class="h-10 w-10 hidden sm:inline-block" />
+          <span class="truncate">Eventer</span>
         </div>
         <div class="hidden flex-none lg:block">
           <ul class="menu menu-horizontal">
@@ -33,8 +33,8 @@
         </div>
       </div>
       <!-- Page content here -->
-      <div class="container mx-auto flex flex-col items-center justify-center h-full">
-        <h2 class="text-2xl font-bold mb-4">Welcome, <span id="usernameDisplay" class="text-primary"><%= username %></span>!</h2>
+      <div class="container mx-auto flex flex-col items-center justify-center h-full px-2 sm:px-0">
+        <h2 class="text-xl sm:text-2xl font-bold mb-4 text-center break-words">Welcome, <span id="usernameDisplay" class="text-primary"><%= username %></span>!</h2>
         <div class="w-full max-w-2xl mb-4">
           <div class="collapse collapse-arrow">
             <input type="checkbox" id="create-event-toggle" class="peer" />
@@ -42,7 +42,7 @@
               <button id="create-event-btn" class="w-full rounded-b-none rounded-t-lg">Create an Event</button>
             </div>
             <div class="collapse-content p-0 card card-border border-base-300">
-              <form id="event-form" class="shadow-md p-6 w-full rounded-t-none rounded-b-lg">
+              <form id="event-form" class="shadow-md p-4 sm:p-6 w-full rounded-t-none rounded-b-lg">
                 <div class="form-control mb-4">
                   <label class="label">
                     <span class="label-text">Event Name</span>
@@ -60,8 +60,15 @@
             </div>
           </div>
         </div>
-        <div id="result" class="mt-4 text-center text-lg font-semibold"></div>
-        <ul id="event-list" class="mt-4 w-full max-w-2xl flex flex-col gap-6"></ul>
+        <div class="w-full max-w-2xl flex flex-col sm:flex-row justify-between items-center mb-2 gap-2 sm:gap-0">
+          <div class="flex gap-2 w-full sm:w-auto">
+            <button id="bulk-delete-btn" class="btn btn-soft btn-error btn-sm flex-1 sm:flex-none" disabled>Delete Selected</button>
+            <button id="clear-completed-btn" class="btn btn-soft btn-success btn-sm flex-1 sm:flex-none">Clear Completed</button>
+          </div>
+          <a href="/settings" class="btn btn-soft btn-secondary btn-sm w-full sm:w-auto">Settings</a>
+        </div>
+        <div id="result" class="mt-4 text-center text-lg font-semibold break-words"></div>
+        <ul id="event-list" class="mt-4 w-full max-w-2xl flex flex-col gap-6 overflow-x-auto"></ul>
       </div>
     </div>
     <div class="drawer-side">
@@ -72,7 +79,7 @@
     </div>
   </div>
   <div id="edit-modal" class="modal">
-    <div class="modal-box">
+    <div class="modal-box w-11/12 max-w-md">
       <h3 class="font-bold text-lg">Edit Event</h3>
       <form id="edit-form">
         <input type="hidden" id="edit-event-id">
@@ -84,33 +91,33 @@
           <label class="label"><span class="label-text">Event Date & Time</span></label>
           <input type="datetime-local" id="edit-event-datetime" class="input input-bordered" required>
         </div>
-        <div class="modal-action">
-          <button type="submit" class="btn btn-soft btn-primary">Save</button>
-          <button type="button" class="btn btn-soft" id="close-edit-modal">Cancel</button>
+        <div class="modal-action flex flex-col sm:flex-row gap-2">
+          <button type="submit" class="btn btn-soft btn-primary w-full sm:w-auto">Save</button>
+          <button type="button" class="btn btn-soft w-full sm:w-auto" id="close-edit-modal">Cancel</button>
         </div>
       </form>
     </div>
   </div>
-  <footer class="footer sm:footer-horizontal text-neutral-content items-center p-4">
-  <aside class="grid-flow-col items-center">
-    <a href="https://euphoriadevelopment.uk" target="_blank" rel="noopener" aria-label="Euphoria Development">
-      <img src="/public/images/logo-t.webp" alt="Eventer Logo" class="h-12 w-12 mr-2" />
-    </a>
-    <p>Copyright © <%= new Date().getFullYear() %> - All rights reserved</p>
-  </aside>
-  <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end">
-    <a href="https://github.com/RepGraphics/eventer" target="_blank" aria-label="GitHub">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="fill-current">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.262.82-.582 0-.288-.01-1.05-.015-2.06-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.606-2.665-.304-5.466-1.332-5.466-5.93 0-1.31.468-2.38 1.236-3.22-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.3 1.23.957-.266 1.984-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.29-1.552 3.295-1.23 3.295-1.23.653 1.653.242 2.873.12 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.804 5.624-5.475 5.921.43.37.823 1.102.823 2.222 0 1.606-.015 2.898-.015 3.293 0 .322.216.699.825.58C20.565 21.796 24 17.297 24 12c0-6.63-5.37-12-12-12z"/>
-      </svg>
-    </a>
-    <a href="https://discord.com/" target="_blank" aria-label="Discord">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="fill-current">
-        <path d="M20.317 4.369A19.791 19.791 0 0 0 16.885 3.1a.074.074 0 0 0-.078.037c-.34.607-.719 1.396-.984 2.01a18.524 18.524 0 0 0-5.59 0 12.51 12.51 0 0 0-.997-2.01.077.077 0 0 0-.078-.037A19.736 19.736 0 0 0 3.677 4.369a.069.069 0 0 0-.032.027C.533 9.09-.32 13.579.099 18.021a.082.082 0 0 0 .031.056c2.104 1.548 4.13 2.489 6.102 3.13a.077.077 0 0 0 .084-.027c.47-.646.888-1.329 1.241-2.049a.076.076 0 0 0-.041-.104c-.662-.251-1.293-.549-1.902-.892a.077.077 0 0 1-.008-.127c.128-.096.256-.197.378-.299a.074.074 0 0 1 .077-.01c4.002 1.826 8.317 1.826 12.277 0a.073.073 0 0 1 .078.009c.122.102.25.203.379.299a.077.077 0 0 1-.006.127 12.298 12.298 0 0 1-1.903.892.076.076 0 0 0-.04.105c.36.72.779 1.403 1.242 2.049a.076.076 0 0 0 .084.028c1.978-.641 4.004-1.582 6.104-3.13a.077.077 0 0 0 .03-.055c.5-5.177-.838-9.637-3.548-13.625a.061.061 0 0 0-.03-.028zM8.02 15.331c-1.183 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.175 1.095 2.156 2.418 0 1.334-.955 2.419-2.156 2.419zm7.974 0c-1.183 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.175 1.095 2.156 2.418 0 1.334-.946 2.419-2.156 2.419z"/>
-      </svg>
-    </a>
-  </nav>
-</footer>
+  <footer class="footer flex flex-col sm:flex-row items-center justify-between text-neutral-content p-4 w-full gap-2 sm:gap-0">
+    <div class="flex items-center gap-2">
+      <a href="https://euphoriadevelopment.uk" target="_blank" rel="noopener" aria-label="Euphoria Development">
+        <img src="/public/images/logo-t.webp" alt="Eventer Logo" class="h-10 w-10" />
+      </a>
+      <p class="text-center sm:text-left text-sm">Copyright © <%= new Date().getFullYear() %> - All rights reserved</p>
+    </div>
+    <div class="flex gap-4 mt-2 sm:mt-0">
+      <a href="https://github.com/RepGraphics/eventer" target="_blank" aria-label="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="fill-current">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.262.82-.582 0-.288-.01-1.05-.015-2.06-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.606-2.665-.304-5.466-1.332-5.466-5.93 0-1.31.468-2.38 1.236-3.22-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.3 1.23.957-.266 1.984-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.29-1.552 3.295-1.23 3.295-1.23.653 1.653.242 2.873.12 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.804 5.624-5.475 5.921.43.37.823 1.102.823 2.222 0 1.606-.015 2.898-.015 3.293 0 .322.216.699.825.58C20.565 21.796 24 17.297 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+      <a href="https://discord.com/" target="_blank" aria-label="Discord">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="fill-current">
+          <path d="M20.317 4.369A19.791 19.791 0 0 0 16.885 3.1a.074.074 0 0 0-.078.037c-.34.607-.719 1.396-.984 2.01a18.524 18.524 0 0 0-5.59 0 12.51 12.51 0 0 0-.997-2.01.077.077 0 0 0-.078-.037A19.736 19.736 0 0 0 3.677 4.369a.069.069 0 0 0-.032.027C.533 9.09-.32 13.579.099 18.021a.082.082 0 0 0 .031.056c2.104 1.548 4.13 2.489 6.102 3.13a.077.077 0 0 0 .084-.027c.47-.646.888-1.329 1.241-2.049a.076.076 0 0 0-.041-.104c-.662-.251-1.293-.549-1.902-.892a.077.077 0 0 1-.008-.127c.128-.096.256-.197.378-.299a.074.074 0 0 1 .077-.01c4.002 1.826 8.317 1.826 12.277 0a.073.073 0 0 1 .078.009c.122.102.25.203.379.299a.077.077 0 0 1-.006.127 12.298 12.298 0 0 1-1.903.892.076.076 0 0 0-.04.105c.36.72.779 1.403 1.242 2.049a.076.076 0 0 0 .084.028c1.978-.641 4.004-1.582 6.104-3.13a.077.077 0 0 0 .03-.055c.5-5.177-.838-9.637-3.548-13.625a.061.061 0 0 0-.03-.028zM8.02 15.331c-1.183 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.175 1.095 2.156 2.418 0 1.334-.955 2.419-2.156 2.419zm7.974 0c-1.183 0-2.156-1.085-2.156-2.419 0-1.333.955-2.418 2.156-2.418 1.21 0 2.175 1.095 2.156 2.418 0 1.334-.946 2.419-2.156 2.419z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
   <script src="/public/js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

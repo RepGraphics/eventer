@@ -1,20 +1,33 @@
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const settingsPath = path.join(__dirname, '../data/user-settings.json');
 
-function sendMail({ to, subject, text, html }) {
+function getUserSmtpSettings(username) {
+  if (!fs.existsSync(settingsPath)) return null;
+  const all = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  return all[username] || null;
+}
+
+async function sendMail({ to, subject, text, html, username }) {
+  let smtpSettings = getUserSmtpSettings(username);
+  if (!smtpSettings || !smtpSettings.smtp_enabled) {
+    throw new Error('SMTP not enabled or not configured for this user');
+  }
+  const transporter = nodemailer.createTransport({
+    host: smtpSettings.smtp_host,
+    port: Number(smtpSettings.smtp_port),
+    secure: Number(smtpSettings.smtp_port) === 465, // Use secure for port 465
+    auth: {
+      user: smtpSettings.smtp_user,
+      pass: smtpSettings.smtp_pass,
+    },
+  });
   return transporter.sendMail({
-    from: process.env.EMAIL_FROM,
-    to,
+    from: smtpSettings.smtp_user,
+    to: to || smtpSettings.smtp_to,
     subject,
     text,
     html,
