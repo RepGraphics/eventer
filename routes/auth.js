@@ -24,11 +24,21 @@ router.post('/login', async (req, res) => {
 
     jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, token) => {
       if (err) throw err;
+      // Set session user for express-session
+      req.session.user = user;
       res.json({ token });
     });
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });
   }
+});
+
+// Logout route
+router.post('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie('connect.sid');
+    res.json({ msg: 'Logged out' });
+  });
 });
 
 module.exports = router;

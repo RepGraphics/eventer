@@ -15,7 +15,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
 db.run(`CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    time TEXT NOT NULL
+    time TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
 )`);
 
 module.exports = {
@@ -31,7 +32,7 @@ module.exports = {
     },
 
     createEvent: (name, time, callback) => {
-        db.run('INSERT INTO events (name, time) VALUES (?, ?)', [name, time], function (err) {
+        db.run('INSERT INTO events (name, time, created_at) VALUES (?, ?, datetime("now"))', [name, time], function (err) {
             if (err) {
                 console.error('Error inserting event:', err);
             } else {
