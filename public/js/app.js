@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:8080/api/auth'; // Change if hosted elsewhere
+// Set API_URL based on current domain
+const API_URL = `${window.location.origin}/api/auth`;
 
 // Only attach login form handler if it exists (login page)
 const loginForm = document.getElementById('loginForm');
