@@ -1,3 +1,6 @@
+require('dotenv').config();
+const APP_URL = process.env.APP_URL || 'http://localhost:8080';
+
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
@@ -50,11 +53,11 @@ router.post('/', async (req, res) => {
                 description: `**Event:** ${name}\n**Time:** <t:${unixTime}:F> (<t:${unixTime}:R>)`,
                 color: 0x2563eb,
                 thumbnail: {
-                  url: 'https://localhost:8080/public/images/logo-t.webp'
+                  url: `${APP_URL}/public/images/logo-t.webp`
                 },
                 footer: {
                   text: 'Eventer Notification',
-                  icon_url: 'https://localhost:8080/public/images/icon.webp'
+                  icon_url: `${APP_URL}/public/images/icon.webp`
                 },
                 timestamp: new Date().toISOString()
               },
@@ -106,11 +109,11 @@ router.put('/:id', async (req, res) => {
                 description: `**Event:** ${name}\n**New Time:** <t:${unixTime}:F> (<t:${unixTime}:R>)`,
                 color: 0xfbbf24,
                 thumbnail: {
-                  url: 'https://localhost:8080/public/images/logo-t.webp'
+                  url: `${APP_URL}/public/images/logo-t.webp`
                 },
                 footer: {
                   text: 'Eventer Notification',
-                  icon_url: 'https://localhost:8080/public/images/icon.webp'
+                  icon_url: `${APP_URL}/public/images/icon.webp`
                 },
                 timestamp: new Date().toISOString()
               },
@@ -164,11 +167,11 @@ router.delete('/:id', async (req, res) => {
                     description: eventName ? `**Event:** ${eventName}\n**Event ID:** ${id} was deleted.` : `**Event ID:** ${id} was deleted.`,
                     color: 0xef4444,
                     thumbnail: {
-                      url: 'https://localhost:8080/public/images/logo-t.webp'
+                      url: `${APP_URL}/public/images/logo-t.webp`
                     },
                     footer: {
                       text: 'Eventer Notification',
-                      icon_url: 'https://localhost:8080/public/images/icon.webp'
+                      icon_url: `${APP_URL}/public/images/icon.webp`
                     },
                     timestamp: new Date().toISOString()
                   },

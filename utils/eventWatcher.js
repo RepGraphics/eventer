@@ -1,3 +1,6 @@
+require('dotenv').config();
+const APP_URL = process.env.APP_URL || 'http://localhost:8080';
+
 const path = require('path');
 const Event = require(path.join(__dirname, '../models/Event'));
 const mailer = require(path.join(__dirname, '../utils/mailer'));
@@ -54,7 +57,7 @@ async function checkAndNotify() {
                       <p style="margin:0; color:#64748b; font-size:13px;">You are receiving this because you enabled reminders in your Eventer settings.</p>
                     </div>
                     <div style="background:#f1f5f9; color:#64748b; text-align:center; padding:12px 0; font-size:13px;">
-                      <img src="https://localhost:8080/public/images/icon.webp" alt="Eventer" style="height:20px; vertical-align:middle; margin-right:6px;"> Eventer &copy; 2025
+                      <img src="${APP_URL}/public/images/icon.webp" alt="Eventer" style="height:20px; vertical-align:middle; margin-right:6px;"> Eventer &copy; 2025
                     </div>
                   </div>
                 `,
@@ -76,11 +79,11 @@ async function checkAndNotify() {
                   description: `**Event:** ${event.name}\n**Starts:** <t:${unixTime}:F> (<t:${unixTime}:R>)`,
                   color: 0x3b82f6,
                   thumbnail: {
-                    url: 'https://localhost:8080/public/images/logo-t.webp'
+                    url: `${APP_URL}/public/images/logo-t.webp`
                   },
                   footer: {
                     text: 'Eventer Notification',
-                    icon_url: 'https://localhost:8080/public/images/icon.webp'
+                    icon_url: `${APP_URL}/public/images/icon.webp`
                   },
                   timestamp: new Date().toISOString()
                 },
@@ -120,7 +123,7 @@ async function checkAndNotify() {
                       <p style="margin:0; color:#64748b; font-size:13px;">You are receiving this because you enabled notifications in your Eventer settings.</p>
                     </div>
                     <div style="background:#f1f5f9; color:#64748b; text-align:center; padding:12px 0; font-size:13px;">
-                      <img src="https://localhost:8080/public/images/icon.webp" alt="Eventer" style="height:20px; vertical-align:middle; margin-right:6px;"> Eventer &copy; 2025
+                      <img src="${APP_URL}/public/images/icon.webp" alt="Eventer" style="height:20px; vertical-align:middle; margin-right:6px;"> Eventer &copy; 2025
                     </div>
                   </div>
                 `,
@@ -142,11 +145,11 @@ async function checkAndNotify() {
                   description: `**Event:** ${event.name}\n**Started:** <t:${unixTime}:F> (<t:${unixTime}:R>)`,
                   color: 0x22c55e,
                   thumbnail: {
-                    url: 'https://localhost:8080/public/images/logo-t.webp'
+                    url: `${APP_URL}/public/images/logo-t.webp`
                   },
                   footer: {
                     text: 'Eventer Notification',
-                    icon_url: 'https://localhost:8080/public/images/icon.webp'
+                    icon_url: `${APP_URL}/public/images/icon.webp`
                   },
                   timestamp: new Date().toISOString()
                 },
