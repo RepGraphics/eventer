@@ -7,6 +7,9 @@ const Event = require('../models/Event');
 const mailer = require('../utils/mailer');
 const discord = require('../utils/discord');
 
+// Add a simple in-memory category list for now
+let categories = [];
+
 // Get all events
 router.get('/', (req, res) => {
     Event.getAllEvents((err, events) => {
@@ -19,11 +22,11 @@ router.get('/', (req, res) => {
 
 // Create a new event
 router.post('/', async (req, res) => {
-    const { name, time } = req.body;
+    const { name, time, category } = req.body;
     if (!name || !time) {
         return res.status(400).json({ error: 'Name and time are required' });
     }
-    Event.createEvent(name, time, async (err, id) => {
+    Event.createEvent(name, time, category || '', async (err, id) => {
         if (err) {
             return res.status(500).json({ error: 'Failed to create event' });
         }
@@ -69,18 +72,18 @@ router.post('/', async (req, res) => {
             }
           }
         }
-        res.json({ id, name, time, notification: 'Event created and notifications sent.' });
+        res.json({ id, name, time, category, notification: 'Event created and notifications sent.' });
     });
 });
 
 // Update an event
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, time } = req.body;
+    const { name, time, category } = req.body;
     if (!name || !time) {
         return res.status(400).json({ error: 'Name and time are required' });
     }
-    Event.updateEvent(id, name, time, async (err) => {
+    Event.updateEvent(id, name, time, category || '', async (err) => {
         if (err) {
             return res.status(500).json({ error: 'Failed to update event' });
         }
@@ -184,6 +187,65 @@ router.delete('/:id', async (req, res) => {
               }
             }
             res.json({ message: 'Event deleted successfully', notification: 'Event deleted and notifications sent.' });
+        });
+    });
+});
+
+// Get all categories
+router.get('/categories', (req, res) => {
+    res.json(categories);
+});
+
+// Add a new category
+router.post('/categories', (req, res) => {
+    const { name } = req.body;
+    if (!name || categories.includes(name)) {
+        return res.status(400).json({ error: 'Invalid or duplicate category' });
+    }
+    categories.push(name);
+    res.json({ success: true, categories });
+});
+
+// Delete a category
+router.delete('/categories/:name', (req, res) => {
+    const name = req.params.name;
+    if (!name) {
+        return res.status(400).json({ error: 'Invalid category' });
+    }
+    // Remove from in-memory list
+    categories = categories.filter(cat => cat !== name);
+    // Move all events in this category to null (no category)
+    const Event = require('../models/Event');
+    Event.getAllEvents((err, events) => {
+        if (err) return res.status(500).json({ error: 'Failed to update events' });
+        const toUpdate = events.filter(ev => ev.category === name);
+        let updated = 0;
+        if (toUpdate.length === 0) return res.json({ success: true, categories });
+        toUpdate.forEach(ev => {
+            Event.updateEvent(ev.id, ev.name, ev.time, null, () => {
+                updated++;
+                if (updated === toUpdate.length) {
+                    res.json({ success: true, categories });
+                }
+            });
+        });
+    });
+});
+
+// Update only the category of an event
+router.put('/:id/category', async (req, res) => {
+    const { id } = req.params;
+    const { category } = req.body;
+    if (typeof category !== 'string') {
+        return res.status(400).json({ error: 'Invalid category' });
+    }
+    Event.getAllEvents((err, events) => {
+        if (err) return res.status(500).json({ error: 'Failed to fetch events' });
+        const event = events.find(e => String(e.id) === String(id));
+        if (!event) return res.status(404).json({ error: 'Event not found' });
+        Event.updateEvent(id, event.name, event.time, category, (err) => {
+            if (err) return res.status(500).json({ error: 'Failed to update category' });
+            res.json({ success: true });
         });
     });
 });

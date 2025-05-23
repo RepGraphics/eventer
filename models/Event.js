@@ -35,6 +35,11 @@ db.run(alterTable2, (err) => {
         console.error('Error adding reminder_sent column:', err.message);
     }
 });
+db.run(`ALTER TABLE events ADD COLUMN category TEXT`, (err) => {
+    if (err && !/duplicate column name/i.test(err.message)) {
+        console.error('Error adding category column:', err.message);
+    }
+});
 
 module.exports = {
     getAllEvents: (callback) => {
@@ -48,8 +53,8 @@ module.exports = {
         });
     },
 
-    createEvent: (name, time, callback) => {
-        db.run('INSERT INTO events (name, time, created_at) VALUES (?, ?, datetime("now"))', [name, time], function (err) {
+    createEvent: (name, time, category, callback) => {
+        db.run('INSERT INTO events (name, time, category, created_at) VALUES (?, ?, ?, datetime("now"))', [name, time, category], function (err) {
             if (err) {
                 console.error('Error inserting event:', err);
             } else {
@@ -59,8 +64,8 @@ module.exports = {
         });
     },
 
-    updateEvent: (id, name, time, callback) => {
-        db.run('UPDATE events SET name = ?, time = ?, sent = 0, reminder_sent = 0 WHERE id = ?', [name, time, id], (err) => {
+    updateEvent: (id, name, time, category, callback) => {
+        db.run('UPDATE events SET name = ?, time = ?, category = ?, sent = 0, reminder_sent = 0 WHERE id = ?', [name, time, category, id], (err) => {
             callback(err);
         });
     },
